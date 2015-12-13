@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>Ansible Milan Kickoff Meeting</title>
+
+        <meta name="description" content="Ansible Milan Kickoff Meeting">
+        <meta name="author" content="Lorenzo Fontana">
+
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+        <!-- Code syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+
+        <style>
+            .facileBottomLogo {
+                background: url(img/facile-eng.png);
+                background-size: 100px;
+                position: absolute;
+                bottom: 30px;
+                left: 100px;
+                width: 100px;
+                height: 100px;"
+            }
+        </style>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+        <div class="reveal">
+
+            <div class="slides">
+
+                <!-- Introduction -->
+                <section>
+                    <h1>Introduction to Ansible</h1>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>$ whoami</h2>
+                        <p>Lorenzo Fontana</p>
+                        <p class="fragment">Software Engineer / DevOps at Facile.it</p>
+                        <p class="fragment"><a href="https://github.com/fntlnz">https://github.com/fntlnz</a></p>
+                        <p class="fragment"><a href="https://twitter.com/fntlnz">https://twitter.com/fntlnz</a></p>
+                    </section>
+                    <section>
+                        <img style="margin: 0px; border: none; background: none; box-shadow: none" width="200px" src="img/facile-eng.png" />
+                        <h2><a href="http://engineering.facile.it">http://engineering.facile.it</a></h2>
+                    </section>
+                </section>
+
+                <!-- What is Ansible -->
+                <section>
+                    <section>
+                    <h2>What is Ansible</h2>
+                    <p>Flexible agentless IT Automation tool that let's you automate everything in all your systems</p>
+                    <p>Batteries included</p>
+                    </section>
+                    <section>
+                        <h2>Agentless</h2>
+                        <p>No remote agents needed, Ansible delivers all modules to remote systems and execute tasks as needed and clean up themeselves when complete.</p>
+                    </section>
+                    <section>
+                        <h2>Automate everything</h2>
+                        <ul>
+                            <li class="fragment">Provisioning</li>
+                            <li class="fragment">Configuration management</li>
+                            <li class="fragment">Application deployment</li>
+                            <li class="fragment">Intra-service orchestration</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>Batteries included</h2>
+                        <ul>
+                            <li class="fragment">Thousands of modules</li>
+                            <li class="fragment">Thousands of roles</li>
+                            <li class="fragment">Well written and extensive documentation</li>
+                            <li class="fragment">Support</li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Why Ansible</h2>
+                        <ul>
+                            <li class="fragment">Idempotent</li>
+                            <li class="fragment">I don't need servers to manage my servers</li>
+                            <li class="fragment">Leverages existing auth</li>
+                            <li class="fragment">Only python needed</li>
+                            <li class="fragment">No programming skills required</li>
+                            <li class="fragment">Easy to adopt</li>
+                            <li class="fragment">Extensible via modules</li>
+                            <li class="fragment">Everything is a YAML file</li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Tasks</h2>
+                    </section>
+                    <section>
+                        <h3>What does this do?</h3>
+                        <pre><code data-trim>
+- name: Install gcc
+  dnf: name=gcc state=latest
+
+- name: Install cmake
+  dnf: name=cmake state=latest
+                        </code></pre>
+                        <p class="fragment">Tasks combine an action (a module and its arguments) with a name,  and optionally some other keywords</p>
+                        <p class="fragment">Yep, dnf is a module</p>
+                    </section>
+                    <section>
+                        <h3>Using a loop</h3>
+                        <pre><code data-trim>
+- name: Install build dependencies
+  dnf: name={{item}} state=latest
+  with_items:
+    - automake
+    - gcc-c++
+    - libtool
+    - pkgconfig
+    - unzip
+    - gcc
+    - make
+    - cmake</code></pre>
+                        <p class="fragment">with_items is one of those <i>other keywords</i></p>
+                    </section>
+                    <section>
+                        <h3>Other modules</h3>
+                        <pre class="fragment"><code data-trim>
+- name: Clone Neovim repository (nightly)
+  git: repo=https://github.com/neovim/neovim.git
+       dest=/tmp/neovim-checkout
+       version=nightly
+       depth=1</code></pre>
+                    <pre class="fragment"><code data-trim>
+- name: make deps
+  command: make deps
+  args:
+    chdir: /tmp/neovim-checkout
+                    </code></pre>
+                    </section>
+                    <section>
+                        <h3>Handlers</h3>
+                        <p class="fragment">When something happen, do something</p>
+                        <p class="fragment">Handlers are <i>tasks</i> that do not run unless they are <i>notified</i></p>
+                        <pre class="fragment"><code data-trim>
+- name: template configuration file
+  template: src=nginx.conf dest=/usr/local/nginx/nginx.conf
+  notify:
+     - restart nginx
+                        </code></pre>
+                        <pre class="fragment"><code data-trim>
+handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+                        </code></pre>
+                        <span class="fragment">What is <i>service</i>?</span><span class="fragment"> a Module!</span>
+                    </section>
+                </section>
+
+                <section>
+                <section>
+                    <h2>Roles</h2>
+                    <p class="fragment">Roles are unit of organization in Ansible. They contains tasks, handlers, templates, variables etc..</p>
+                    <ul>
+                        <li class="fragment">Break up configuration into repeatable chunks</li>
+                        <li class="fragment">Clean structure (next slide)</li>
+                        <li class="fragment">Share them on Ansible Galaxy</li>
+                        <li class="fragment">Reusable and recyclable</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>How a role looks like</h3>
+                <pre><code data-trim>
+roles/
+    nginx/
+        tasks/
+            main.yml
+        handlers/
+            main.yml
+        templates/
+            nginx.conf
+            mysite.conf
+        files/
+            bar.txt
+            foo.sh
+        vars/
+            main.yml
+        defaults/
+            main.yml
+            </pre></code>
+                </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Playbooks</h2>
+                        <p class="fragment">A playbooks is a list of plays, a play is a mapping between a set of hosts and the tasks which run on those hosts to define the role that those systems will perform<p>
+                    </section>
+                    <section>
+                        <h3>All in one playbook</h3>
+                        <pre><code data-trim>
+---
+- hosts: webservers
+  vars:
+    http_port: 80
+  remote_user: root
+  tasks:
+  - name: ensure nginx is at the latest version
+    yum: name=nginx state=latest
+  - name: write the nginx config file
+    template: src=nginx.conf dest=/usr/local/nginx/nginx.conf
+    notify:
+    - restart nginx
+  - name: ensure nginx is running (and enable it at boot)
+    service: name=nginx state=started enabled=yes
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+                        </code></pre>
+                        <p class="fragment">Not very reusable/extensible</p>
+                    </section>
+                    <section>
+                        <h3>Playbook using roles</h3>
+                        <pre><code data-trim>
+---
+- hosts: webservers
+  vars:
+    http_port: 80
+  roles:
+   - nginx
+   - php-fpm
+
+- hosts: dbservers
+  roles:
+   - mysql
+</code></pre>
+                    </section>
+                    <section>
+                        <h3>How to run a playbook?</h3>
+                        <pre><code>ansible-playbook myplaybook.yml -vvvv</code></pre>
+                    </section>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Ad-hoc command</h2>
+                        <p class="fragment">Do something really quick, but don't want to save for later</p>
+                    </section> 
+                    <section>
+                        <h4>Run an aribrary command on all matching hosts</h4>
+                        <pre><code data-trim>
+$ ansible dbservers -m command -a "whoami"
+
+db02 | success | rc=0 >>
+fntlnz
+
+db01 | success | rc=0 >>
+fntlnz
+
+db03 | success | rc=0 >>
+fntlnz
+</code></pre>
+                    </section>
+                    <section>
+                        <h4>Ping all matching hosts</h4>
+                        <pre><code data-trim>
+$ ansible dbservers -m ping 
+db02 | success >> {
+    "changed": false, 
+    "ping": "pong"
+}
+
+db03 | success >> {
+    "changed": false, 
+    "ping": "pong"
+}
+
+db01 | success >> {
+    "changed": false, 
+    "ping": "pong"
+}
+                        </code></pre>
+                    </section>
+
+                </section>
+
+                <section>
+                    <h1>Questions?</h1>
+                </section>
+                <section>
+                    <h2>Ideas for next meetups?</h2>
+                    <ul>
+                        <li class="fragment">Writing modules</li>
+                        <li class="fragment">Ansible + docker</li>
+                        <li class="fragment">Orchestration on AWS</li>
+                        <li class="fragment">Application deployment</li>
+                        <li class="fragment">Dynamic inventories</li>
+                    </ul>
+                </section>
+
+            </div>
+
+        </div>
+        <div class="facileBottomLogo"></div>
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+
+            // Full list of configuration options available at:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+                // Optional reveal.js plugins
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/notes/notes.js', async: true }
+                ]
+            });
+
+        </script>
+
+    </body>
+</html>
